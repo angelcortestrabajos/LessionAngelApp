@@ -1,11 +1,16 @@
-
 package com.example.lessionangel
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.delay
 import org.json.JSONArray
 import org.json.JSONObject
@@ -199,6 +205,45 @@ fun LessionApp() {
         recording = false
     }
 
+    val bluetoothPermissions = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT
+            )
+        } else {
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    val bluetoothPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        val allGranted = result.all { it.value }
+        if (allGranted) {
+            connected = true
+        } else {
+            Toast.makeText(
+                context,
+                "Se necesitan permisos de Bluetooth para continuar.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    fun requestConnectionPermissionsIfNeeded() {
+        val shouldRequestBluetoothPermissions = connectionType == "Bluetooth" &&
+            bluetoothPermissions.any { permission ->
+                ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED
+            }
+
+        if (shouldRequestBluetoothPermissions) {
+            bluetoothPermissionLauncher.launch(bluetoothPermissions)
+        } else {
+            connected = true
+        }
+    }
+
     MaterialTheme(
         colorScheme = lightColorScheme(
             primary = Card,
@@ -335,7 +380,7 @@ fun LessionApp() {
                         Button(
                             onClick = {
                                 if (selectedDevice.isNotEmpty()) {
-                                    connected = true
+                                    requestConnectionPermissionsIfNeeded()
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),

@@ -205,7 +205,10 @@ fun LessionApp() {
         recording = false
     }
 
-    val bluetoothPermissions = remember {
+    var connectionError by remember { mutableStateOf<String?>(null) }
+    var permissionRequestInProgress by remember { mutableStateOf(false) }
+
+    val requiredBluetoothPermissions = remember {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             arrayOf(
                 Manifest.permission.BLUETOOTH_SCAN,
@@ -219,28 +222,70 @@ fun LessionApp() {
     val bluetoothPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
-        val allGranted = result.all { it.value }
-        if (allGranted) {
+        permissionRequestInProgress = false
+        val missingPermissions = requiredBluetoothPermissions.filter { permission ->
+            result[permission] != true
+        }
+
+        if (missingPermissions.isEmpty()) {
             connected = true
+            connectionError = null
         } else {
+            connected = false
+            connectionError = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                "Necesitas aceptar Bluetooth y ubicación para conectar el sensor ESP32."
+            } else {
+                "Necesitas aceptar el permiso de ubicación para detectar dispositivos Bluetooth."
+            }
             Toast.makeText(
                 context,
-                "Se necesitan permisos de Bluetooth para continuar.",
+                connectionError,
                 Toast.LENGTH_SHORT
             ).show()
         }
     }
 
-    fun requestConnectionPermissionsIfNeeded() {
-        val shouldRequestBluetoothPermissions = connectionType == "Bluetooth" &&
-            bluetoothPermissions.any { permission ->
-                ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED
-            }
+    fun connectToSelectedDevice() {
+        if (connectionType == "WiFi") {
+            connected = true
+            connectionError = null
+            return
+        }
 
-        if (shouldRequestBluetoothPermissions) {
-            bluetoothPermissionLauncher.launch(bluetoothPermissions)
+        val missingPermissions = requiredBluetoothPermissions.filter { permission ->
+            ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
+            permissionRequestInProgress = true
+            bluetoothPermissionLauncher.launch(requiredBluetoothPermissions)
+            return
+        }
+
+        // Preparado para Bluetooth real con ESP32 usando BluetoothAdapter/BluetoothDevice + GATT
+        // en una futura etapa, pero el flujo demo actual sigue siendo válido hasta que el hardware
+        // y la capa de conexión estén implementados.
+        connected = true
+        connectionError = null
+    }
+
+    fun requestConnectionPermissionsIfNeeded() {
+        if (connectionType == "WiFi") {
+            connected = true
+            connectionError = null
+            return
+        }
+
+        val missingPermissions = requiredBluetoothPermissions.filter { permission ->
+            ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
+            permissionRequestInProgress = true
+            bluetoothPermissionLauncher.launch(requiredBluetoothPermissions)
         } else {
             connected = true
+            connectionError = null
         }
     }
 
@@ -407,6 +452,16 @@ fun LessionApp() {
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text("Continuar")
+                            }
+                        } else {
+                            connectionError?.let {
+                                Spacer(Modifier.height(15.dp))
+
+                                Text(
+                                    text = it,
+                                    color = Red,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
 

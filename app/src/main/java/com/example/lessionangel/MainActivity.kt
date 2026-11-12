@@ -2,6 +2,9 @@ package com.example.lessionangel
 
 import android.Manifest
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -32,11 +35,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DateFormat
 import java.util.Date
+import java.util.UUID
 import kotlin.random.Random
 
 private data class Measurement(
@@ -143,6 +150,9 @@ fun LessionApp() {
     var selectedDevice by remember { mutableStateOf("") }
     var connected by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
+    var isConnecting by remember { mutableStateOf(false) }
+    var connectionStatus by remember { mutableStateOf("Listo para conectar") }
+    var bluetoothSocket by remember { mutableStateOf<BluetoothSocket?>(null) }
 
     var recording by remember { mutableStateOf(false) }
 
@@ -245,33 +255,70 @@ fun LessionApp() {
         }
     }
 
-    fun connectToSelectedDevice() {
+    val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+
+    fun resolveBluetoothDevice(targetName: String): BluetoothDevice? {
+        return bluetoothAdapter?.bondedDevices
+            ?.firstOrNull { it.name == targetName }
+    }
+
+    fun attemptBluetoothConnection() {
         if (connectionType == "WiFi") {
             connected = true
+            connectionStatus = "Conexión Wi‑Fi simulada correcta"
             connectionError = null
             return
         }
 
-        val missingPermissions = requiredBluetoothPermissions.filter { permission ->
-            ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED
-        }
-
-        if (missingPermissions.isNotEmpty()) {
-            permissionRequestInProgress = true
-            bluetoothPermissionLauncher.launch(requiredBluetoothPermissions)
+        val device = resolveBluetoothDevice(selectedDevice)
+        if (device == null) {
+            connectionError = "No se encontró el dispositivo Bluetooth seleccionado."
+            connected = false
+            Toast.makeText(context, connectionError, Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Preparado para Bluetooth real con ESP32 usando BluetoothAdapter/BluetoothDevice + GATT
-        // en una futura etapa, pero el flujo demo actual sigue siendo válido hasta que el hardware
-        // y la capa de conexión estén implementados.
-        connected = true
+        isConnecting = true
+        connectionStatus = "Conectando con ${device.name}..."
         connectionError = null
+
+        val uuid = UUID.fromString("00001101-0000-0000-0000-000000000000")
+
+        val socket = try {
+            device.createRfcommSocketToServiceRecord(uuid)
+        } catch (e: SecurityException) {
+            isConnecting = false
+            connectionError = "El dispositivo requiere permisos Bluetooth activos."
+            Toast.makeText(context, connectionError, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        bluetoothSocket = socket
+
+        val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    socket.connect()
+                }
+                isConnecting = false
+                connected = true
+                connectionStatus = "Conectado a ${device.name}"
+                connectionError = null
+            } catch (e: Exception) {
+                isConnecting = false
+                connected = false
+                connectionStatus = "No se pudo conectar con ${device.name}"
+                connectionError = "Conexión Bluetooth fallida. Comprueba que el ESP32 esté encendido y emparejado."
+                Toast.makeText(context, connectionError, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     fun requestConnectionPermissionsIfNeeded() {
         if (connectionType == "WiFi") {
             connected = true
+            connectionStatus = "Conexión Wi‑Fi simulada correcta"
             connectionError = null
             return
         }
@@ -282,11 +329,23 @@ fun LessionApp() {
 
         if (missingPermissions.isNotEmpty()) {
             permissionRequestInProgress = true
+            connectionStatus = "Solicitando permisos Bluetooth"
             bluetoothPermissionLauncher.launch(requiredBluetoothPermissions)
-        } else {
-            connected = true
-            connectionError = null
+            return
         }
+
+        attemptBluetoothConnection()
+    }
+
+    fun resetConnectionState() {
+        connected = false
+        isConnecting = false
+        connectionStatus = "Listo para conectar"
+        connectionError = null
+        try {
+            bluetoothSocket?.close()
+        } catch (_: Exception) { }
+        bluetoothSocket = null
     }
 
     MaterialTheme(

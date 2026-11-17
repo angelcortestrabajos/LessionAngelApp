@@ -1,0 +1,132 @@
+@startuml
+title LessionAngel - Casos de uso y trazabilidad de pruebas
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+actor "Deportista" as Deportista
+actor "Banda / sensor" as Sensor
+
+rectangle "Sistema LessionAngel" {
+  usecase "UC01\nBuscar dispositivos" as UC01
+  usecase "UC02\nSeleccionar dispositivo" as UC02
+  usecase "UC03\nConectar / desconectar\n(Bluetooth o Wi-Fi)" as UC03
+  usecase "UC04\nIniciar toma de datos" as UC04
+  usecase "UC05\nDetener toma de datos" as UC05
+  usecase "UC06\nConsultar métricas y gráficos\nen tiempo real" as UC06
+  usecase "UC07\nGuardar sesión y\nmostrar resultados" as UC07
+  usecase "UC08\nConsultar historial" as UC08
+  usecase "UC09\nIniciar nueva sesión" as UC09
+  usecase "UC10\nBorrar sesión seleccionada" as UC10
+  usecase "UC11\nSolicitar salida" as UC11
+  usecase "UC12\nConfirmar salida" as UC12
+  usecase "UC13\nCancelar salida" as UC13
+}
+
+Deportista --> UC01
+Deportista --> UC02
+Deportista --> UC03
+Deportista --> UC04
+Deportista --> UC05
+Deportista --> UC06
+Deportista --> UC07
+Deportista --> UC08
+Deportista --> UC09
+Deportista --> UC10
+Deportista --> UC11
+Deportista --> UC12
+Deportista --> UC13
+Sensor --> UC03
+Sensor --> UC04
+Sensor --> UC06
+
+UC03 ..> UC01 : <<include>>
+UC03 ..> UC02 : <<include>>
+UC06 ..> UC04 : <<extend>>
+UC07 ..> UC05 : <<extend>>
+UC12 ..> UC11 : <<extend>>
+UC13 ..> UC11 : <<extend>>
+
+package "Casos de prueba (criterios de aceptación)" {
+  usecase "TC01\nDescubrir dispositivos\npor Bluetooth" as TC01 <<caso de prueba>>
+  usecase "TC02\nDescubrir dispositivos\npor Wi-Fi" as TC02 <<caso de prueba>>
+  usecase "TC03\nConectar y mostrar\nestado" as TC03 <<caso de prueba>>
+  usecase "TC04\nIniciar captura de\nmediciones" as TC04 <<caso de prueba>>
+  usecase "TC05\nDetener captura" as TC05 <<caso de prueba>>
+  usecase "TC06\nActualizar métricas\ny gráficos" as TC06 <<caso de prueba>>
+  usecase "TC07\nGuardar y analizar\nresultados" as TC07 <<caso de prueba>>
+  usecase "TC08\nConsultar historial\npersistido" as TC08 <<caso de prueba>>
+  usecase "TC09\nCrear nueva sesión" as TC09 <<caso de prueba>>
+  usecase "TC10\nBorrar sesión elegida" as TC10 <<caso de prueba>>
+  usecase "TC11\nCancelar salida" as TC11 <<caso de prueba>>
+  usecase "TC12\nConfirmar salida" as TC12 <<caso de prueba>>
+}
+
+TC01 ..> UC01 : <<verifica>>
+TC02 ..> UC01 : <<verifica>>
+TC03 ..> UC02 : <<verifica>>
+TC03 ..> UC03 : <<verifica>>
+TC04 ..> UC04 : <<verifica>>
+TC05 ..> UC05 : <<verifica>>
+TC06 ..> UC06 : <<verifica>>
+TC07 ..> UC07 : <<verifica>>
+TC08 ..> UC08 : <<verifica>>
+TC09 ..> UC09 : <<verifica>>
+TC10 ..> UC10 : <<verifica>>
+TC11 ..> UC13 : <<verifica>>
+TC12 ..> UC12 : <<verifica>>
+
+note bottom of TC01
+  Pasos: elegir Bluetooth e iniciar búsqueda.
+  Esperado: se muestran los dispositivos encontrados.
+end note
+note bottom of TC02
+  Pasos: elegir Wi-Fi e iniciar búsqueda.
+  Esperado: se muestran los dispositivos encontrados.
+end note
+note bottom of TC03
+  Pasos: seleccionar un dispositivo e intentar conectar/desconectar.
+  Esperado: el estado cambia correctamente a conectado/desconectado.
+end note
+note bottom of TC04
+  Pasos: comenzar con un dispositivo conectado.
+  Esperado: inicia la captura y aparecen nuevas mediciones.
+end note
+note bottom of TC05
+  Pasos: detener una captura activa.
+  Esperado: cesan las actualizaciones y la sesión queda finalizada.
+end note
+note bottom of TC06
+  Pasos: mantener una sesión activa y observar las métricas.
+  Esperado: frecuencia cardíaca, esfuerzo y fatiga se actualizan en los gráficos.
+end note
+note bottom of TC07
+  Pasos: guardar una sesión con lecturas.
+  Esperado: se muestran lecturas, gráficos y análisis; la sesión queda guardada.
+end note
+note bottom of TC08
+  Pasos: guardar una sesión, salir de resultados y abrir el historial.
+  Esperado: la sesión guardada aparece para consulta.
+end note
+note bottom of TC09
+  Pasos: elegir hacer una nueva sesión.
+  Esperado: comienza un entrenamiento nuevo sin lecturas anteriores.
+end note
+note bottom of TC10
+  Pasos: seleccionar y borrar una sesión del historial.
+  Esperado: se elimina la sesión seleccionada, no las demás.
+end note
+note bottom of TC11
+  Pasos: solicitar salir y cancelar la confirmación.
+  Esperado: el diálogo se cierra y la aplicación permanece abierta.
+end note
+note bottom of TC12
+  Pasos: solicitar salir y confirmar.
+  Esperado: la aplicación finaliza.
+end note
+
+note "Trazabilidad: HU01 → UC01-UC03 / TC01-TC03; HU02 → UC04-UC05 / TC04-TC05;\nHU03 → UC06 / TC06; HU04 → UC07-UC08 / TC07-TC08; HU05 → UC09-UC13 / TC09-TC12.\n\nLa recepción real de sensores Bluetooth/Wi-Fi es un requisito; la versión demo puede simular las mediciones." as Trazabilidad
+Trazabilidad .. UC01
+Trazabilidad .. TC01
+@enduml

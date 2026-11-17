@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1770" viewBox="0 0 1600 1770" role="img" aria-labelledby="title description">
+  <title id="title">LessionAngel: diagrama UML de casos de uso y casos de prueba</title>
+  <desc id="description">Diagrama de casos de uso para las historias HU01 a HU05 y tabla visual de doce casos de prueba con sus resultados esperados.</desc>
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #20243a; }
+      .title { font-size: 30px; font-weight: 700; }
+      .subtitle { font-size: 15px; fill: #596078; }
+      .system { fill: #fbfbff; stroke: #5040a0; stroke-width: 3; }
+      .group { fill: #f2f0ff; stroke: #b7afe6; stroke-width: 1.5; }
+      .group-title { font-size: 17px; font-weight: 700; fill: #403582; }
+      .uc { fill: #fff; stroke: #5040a0; stroke-width: 2; }
+      .uc-text { font-size: 15px; text-anchor: middle; }
+      .actor { stroke: #252943; stroke-width: 3; fill: none; stroke-linecap: round; }
+      .actor-label { font-size: 16px; font-weight: 700; text-anchor: middle; }
+      .association { stroke: #646a7c; stroke-width: 1.6; fill: none; }
+      .include { stroke: #77718d; stroke-width: 1.5; stroke-dasharray: 6 5; fill: none; }
+      .table-head { fill: #5040a0; }
+      .table-head-text { fill: white; font-size: 14px; font-weight: 700; }
+      .row-a { fill: #fff; }
+      .row-b { fill: #f4f3fa; }
+      .cell { stroke: #d7d8e2; stroke-width: 1; }
+      .cell-text { font-size: 13px; }
+      .tc { font-weight: 700; fill: #403582; }
+      .note { font-size: 13px; fill: #596078; }
+    </style>
+  </defs>
+  <rect width="1600" height="1770" fill="#ffffff"/>
+  <text x="800" y="46" class="title" text-anchor="middle">LessionAngel — casos de uso y casos de prueba</text>
+  <text x="800" y="73" class="subtitle" text-anchor="middle">Historias de usuario HU01–HU05 · UML de casos de uso y trazabilidad de pruebas</text>
+
+  <rect x="235" y="100" width="1315" height="850" rx="14" class="system"/>
+  <rect x="265" y="112" width="400" height="34" rx="8" fill="#5040a0"/>
+  <text x="465" y="135" fill="#fff" font-size="17" font-weight="700" text-anchor="middle">Sistema LessionAngel</text>
+
+  <!-- Actors -->
+  <circle cx="115" cy="500" r="20" class="actor"/>
+  <path d="M115 520 V585 M78 545 H152 M115 585 L85 625 M115 585 L145 625" class="actor"/>
+  <text x="115" y="654" class="actor-label">Deportista</text>
+  <circle cx="1570" cy="500" r="20" class="actor"/>
+  <path d="M1570 520 V585 M1533 545 H1607 M1570 585 L1540 625 M1570 585 L1600 625" class="actor"/>
+  <text x="1570" y="654" class="actor-label">Banda / sensor</text>
+
+  <!-- Story groups -->
+  <rect x="265" y="165" width="390" height="745" rx="12" class="group"/>
+  <text x="460" y="195" class="group-title" text-anchor="middle">HU01 · Conexión de dispositivos</text>
+  <rect x="675" y="165" width="390" height="745" rx="12" class="group"/>
+  <text x="870" y="195" class="group-title" text-anchor="middle">HU02 · Toma de datos</text>
+  <rect x="1085" y="165" width="435" height="745" rx="12" class="group"/>
+  <text x="1302" y="195" class="group-title" text-anchor="middle">HU03–HU05 · Métricas y sesiones</text>
+
+  <!-- User associations -->
+  <path d="M152 545 H220 V270 H305" class="association"/>
+  <path d="M1533 545 H1480 V270 H1465" class="association"/>
+
+  <!-- HU01 use cases -->
+  <ellipse cx="460" cy="270" rx="155" ry="38" class="uc"/>
+  <text x="460" y="266" class="uc-text"><tspan x="460">UC01 · Buscar dispositivos</tspan><tspan x="460" dy="18">(Bluetooth o Wi-Fi)</tspan></text>
+  <ellipse cx="460" cy="385" rx="155" ry="38" class="uc"/>
+  <text x="460" y="390" class="uc-text">UC02 · Seleccionar dispositivo</text>
+  <ellipse cx="460" cy="500" rx="155" ry="38" class="uc"/>
+  <text x="460" y="496" class="uc-text"><tspan x="460">UC03 · Conectar / desconectar</tspan><tspan x="460" dy="18">y mostrar estado</tspan></text>
+
+  <!-- HU02 use cases -->
+  <ellipse cx="870" cy="385" rx="155" ry="38" class="uc"/>
+  <text x="870" y="390" class="uc-text">UC04 · Iniciar toma de datos</text>
+  <ellipse cx="870" cy="500" rx="155" ry="38" class="uc"/>
+  <text x="870" y="505" class="uc-text">UC05 · Detener toma de datos</text>
+
+  <!-- HU03-HU05 use cases -->
+  <ellipse cx="1300" cy="270" rx="165" ry="38" class="uc"/>
+  <text x="1300" y="266" class="uc-text"><tspan x="1300">UC06 · Consultar métricas</tspan><tspan x="1300" dy="18">y gráficos en tiempo real</tspan></text>
+  <ellipse cx="1300" cy="385" rx="165" ry="38" class="uc"/>
+  <text x="1300" y="381" class="uc-text"><tspan x="1300">UC07 · Guardar sesión</tspan><tspan x="1300" dy="18">y mostrar resultados</tspan></text>
+  <ellipse cx="1300" cy="500" rx="165" ry="38" class="uc"/>
+  <text x="1300" y="505" class="uc-text">UC08 · Consultar historial</text>
+  <ellipse cx="1300" cy="615" rx="165" ry="38" class="uc"/>
+  <text x="1300" y="620" class="uc-text">UC09 · Iniciar nueva sesión</text>
+  <ellipse cx="1300" cy="700" rx="165" ry="34" class="uc"/>
+  <text x="1300" y="705" class="uc-text">UC10 · Borrar sesión seleccionada</text>
+  <ellipse cx="1300" cy="785" rx="165" ry="34" class="uc"/>
+  <text x="1300" y="790" class="uc-text">UC11 · Solicitar salida</text>
+  <ellipse cx="1195" cy="865" rx="125" ry="30" class="uc"/>
+  <text x="1195" y="870" class="uc-text">UC12 · Confirmar salida</text>
+  <ellipse cx="1405" cy="865" rx="105" ry="30" class="uc"/>
+  <text x="1405" y="870" class="uc-text">UC13 · Cancelar salida</text>
+
+  <!-- Include / extend relationships -->
+  <path d="M460 308 V347 M460 423 V462" class="include"/>
+  <text x="474" y="334" font-size="11" fill="#77718d">&lt;&lt;include&gt;&gt;</text>
+  <text x="474" y="449" font-size="11" fill="#77718d">&lt;&lt;include&gt;&gt;</text>
+  <path d="M870 423 V462 M1300 423 V462 M1300 819 L1210 840 M1300 819 L1390 840" class="include"/>
+  <text x="884" y="449" font-size="11" fill="#77718d">&lt;&lt;extend&gt;&gt;</text>
+  <text x="1314" y="449" font-size="11" fill="#77718d">&lt;&lt;extend&gt;&gt;</text>
+  <text x="1212" y="830" font-size="11" fill="#77718d">&lt;&lt;extend&gt;&gt;</text>
+  <text x="1375" y="830" font-size="11" fill="#77718d">&lt;&lt;extend&gt;&gt;</text>
+
+  <text x="800" y="985" class="title" text-anchor="middle" font-size="23">Casos de prueba · criterios de aceptación</text>
+  <text x="800" y="1010" class="subtitle" text-anchor="middle">Cada prueba verifica el comportamiento esperado para una historia de usuario.</text>
+
+  <!-- Test case table -->
+  <rect x="70" y="1030" width="1460" height="38" class="table-head"/>
+  <text x="90" y="1054" class="table-head-text">ID</text>
+  <text x="175" y="1054" class="table-head-text">HU</text>
+  <text x="300" y="1054" class="table-head-text">Caso de prueba</text>
+  <text x="790" y="1054" class="table-head-text">Resultado esperado</text>
+
+  <g class="cell-text">
+    <rect x="70" y="1068" width="1460" height="48" class="row-a cell"/><text x="90" y="1097" class="tc">TC01</text><text x="175" y="1097">HU01</text><text x="300" y="1097">Buscar por Bluetooth</text><text x="790" y="1097">Se muestran los dispositivos Bluetooth encontrados.</text>
+    <rect x="70" y="1116" width="1460" height="48" class="row-b cell"/><text x="90" y="1145" class="tc">TC02</text><text x="175" y="1145">HU01</text><text x="300" y="1145">Buscar por Wi-Fi</text><text x="790" y="1145">Se muestran los dispositivos Wi-Fi encontrados.</text>
+    <rect x="70" y="1164" width="1460" height="48" class="row-a cell"/><text x="90" y="1193" class="tc">TC03</text><text x="175" y="1193">HU01</text><text x="300" y="1193">Seleccionar y conectar / desconectar dispositivo</text><text x="790" y="1193">El estado cambia correctamente entre conectado y desconectado.</text>
+    <rect x="70" y="1212" width="1460" height="48" class="row-b cell"/><text x="90" y="1241" class="tc">TC04</text><text x="175" y="1241">HU02</text><text x="300" y="1241">Comenzar la toma de datos</text><text x="790" y="1241">Comienza la captura y aparecen nuevas mediciones.</text>
+    <rect x="70" y="1260" width="1460" height="48" class="row-a cell"/><text x="90" y="1289" class="tc">TC05</text><text x="175" y="1289">HU02</text><text x="300" y="1289">Detener una captura activa</text><text x="790" y="1289">Cesan las actualizaciones y la sesión queda finalizada.</text>
+    <rect x="70" y="1308" width="1460" height="48" class="row-b cell"/><text x="90" y="1337" class="tc">TC06</text><text x="175" y="1337">HU03</text><text x="300" y="1337">Observar métricas durante una sesión</text><text x="790" y="1337">Frecuencia cardíaca, esfuerzo y fatiga se actualizan en los gráficos.</text>
+    <rect x="70" y="1356" width="1460" height="48" class="row-a cell"/><text x="90" y="1385" class="tc">TC07</text><text x="175" y="1385">HU04</text><text x="300" y="1385">Guardar una sesión con lecturas</text><text x="790" y="1385">Se muestran resultados y análisis, y la sesión queda guardada.</text>
+    <rect x="70" y="1404" width="1460" height="48" class="row-b cell"/><text x="90" y="1433" class="tc">TC08</text><text x="175" y="1433">HU04</text><text x="300" y="1433">Consultar el historial</text><text x="790" y="1433">La sesión guardada aparece disponible para consulta.</text>
+    <rect x="70" y="1452" width="1460" height="48" class="row-a cell"/><text x="90" y="1481" class="tc">TC09</text><text x="175" y="1481">HU05</text><text x="300" y="1481">Iniciar una nueva sesión</text><text x="790" y="1481">Comienza un entrenamiento nuevo sin lecturas anteriores.</text>
+    <rect x="70" y="1500" width="1460" height="48" class="row-b cell"/><text x="90" y="1529" class="tc">TC10</text><text x="175" y="1529">HU05</text><text x="300" y="1529">Borrar una sesión seleccionada</text><text x="790" y="1529">Se elimina solo la sesión elegida; las demás se conservan.</text>
+    <rect x="70" y="1548" width="1460" height="48" class="row-a cell"/><text x="90" y="1577" class="tc">TC11</text><text x="175" y="1577">HU05</text><text x="300" y="1577">Cancelar la confirmación de salida</text><text x="790" y="1577">El diálogo se cierra y la aplicación permanece abierta.</text>
+    <rect x="70" y="1596" width="1460" height="48" class="row-b cell"/><text x="90" y="1625" class="tc">TC12</text><text x="175" y="1625">HU05</text><text x="300" y="1625">Confirmar la salida</text><text x="790" y="1625">La aplicación finaliza.</text>
+  </g>
+  <path d="M155 1030 V1644 M275 1030 V1644 M765 1030 V1644" class="cell"/>
+  <text x="70" y="1685" class="note">Nota: la aplicación demo puede simular lecturas; la recepción real desde Bluetooth o Wi-Fi debe validarse con un dispositivo compatible.</text>
+  <text x="70" y="1710" class="note">El caso UC03 incluye búsqueda y selección de un dispositivo. Las pruebas TC01–TC12 cubren las historias HU01–HU05.</text>
+</svg>

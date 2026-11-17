@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -35,6 +34,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -122,7 +124,6 @@ private val Accent = Color(0xFFE5FF00)
 private val Dark = Color.White
 private val Background = Purple
 private val Card = Color(0xFF321B9B)
-private val Green = Color(0xFF2FB56B)
 private val Red = Color(0xFFE45757)
 
 enum class AppScreen {
@@ -143,8 +144,60 @@ class MainActivity : ComponentActivity() {
 fun LessionApp() {
 
     val context = LocalContext.current.applicationContext
+    val coroutineScope = rememberCoroutineScope()
     var screen by remember { mutableStateOf(AppScreen.CONNECTION) }
     var historyReturnScreen by remember { mutableStateOf(AppScreen.CONNECTION) }
+
+    val sessionRepository = remember { SessionRepository() }
+    val cloudSyncStatus by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            runCatching { sessionRepository.ensureSignedIn() }
+                .onFailure {
+                    Toast.makeText(context, "No se pudo iniciar sesión en Firebase.", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    val sessionToCloud: (TrainingSession) -> TrainingSessionCloud = { localSession ->
+        TrainingSessionCloud(
+            id = localSession.id.toString(),
+            userId = "",
+            startedAt = localSession.startedAt,
+            finishedAt = localSession.finishedAt,
+            readings = localSession.readings.map { reading ->
+                SessionReading(
+                    heartRate = reading.heartRate,
+                    effort = reading.effort,
+                    fatigue = reading.fatigue,
+                    steps = reading.steps
+                )
+            }
+        )
+    }
+
+    fun saveSessionToCloud(localSession: TrainingSession) {
+        coroutineScope.launch {
+            runCatching {
+                sessionRepository.saveSession(sessionToCloud(localSession))
+            }.onFailure {
+                Toast.makeText(
+                    context,
+                    "La sesión se guardó localmente, pero no pudo sincronizarse con Firebase.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    fun deleteCloudSession(sessionId: Long) {
+        coroutineScope.launch {
+            runCatching {
+                sessionRepository.deleteSession(sessionId.toString())
+            }
+        }
+    }
 
     var connectionType by remember { mutableStateOf("Bluetooth") }
     var selectedDevice by remember { mutableStateOf("") }
@@ -670,6 +723,7 @@ fun LessionApp() {
                                     sessions.add(saved)
                                     saveSessions(context, sessions)
                                     selectedSession = saved
+                                    saveSessionToCloud(saved)
                                     screen = AppScreen.RESULTS
                                 },
                                 enabled = sessionReadings.isNotEmpty()
@@ -912,6 +966,7 @@ fun LessionApp() {
                                 selectedSession?.let { deleted ->
                                     sessions.removeAll { it.id == deleted.id }
                                     saveSessions(context, sessions)
+                                    deleteCloudSession(deleted.id)
                                 }
                                 clearActiveSession()
                                 selectedSession = null

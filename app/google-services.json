@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "222255027099",
+    "project_id": "lessionangel",
+    "storage_bucket": "lessionangel.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222255027099:android:a8cf4ed69c8585784b073e",
+        "android_client_info": {
+          "package_name": "com.example.lessionangel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMLGK4gIzRyvKzTJVb8Y29lfP9p62dYFE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
